@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="tictactoe.css">
+
+</head>
+<style>
+    .ticTable td {
+  height: 50px;
+  width: 50px;
+  padding: 15px;
+  font-size: 3em;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ticTable td:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  text-shadow: 2px 1px 1px white;
+}
+
+.borderBottom {
+  border-bottom: 1px solid black;
+}
+
+.borderRight {
+  border-right: 1px solid black;
+}
+
+.container {
+  margin: 20px;
+  display: inline-block;
+  text-align: center;
+}
+
+hr{
+  width: 80%;
+  margin-bottom: 20px;
+}
+
+.board {
+  margin: 20px 60px;
+  display: inline-block;
+  float: left;
+}
+
+.controls {
+  float: left;
+  min-width: 400px;
+  min-height: 10px;
+  text-align: center;
+  display: inline-block;
+  margin: 20px 80px;
+  background-color: rgba(128, 128, 128, 0.08);
+}
+
+.controls span {
+  display: inline-block;
+  text-align: center;
+  width: 100px;
+  padding: 20px;
+  margin: 0 10px;
+}
+
+.controls p {
+  color: grey;
+}
+
+.controls button {
+  margin: 25px 15px;
+  color: white;
+  width: 100px;
+  padding: 10px;
+  background-color: rgba(39, 39, 39, 0.74);
+  font-size: 0.8em;
+  border-radius: 0.3em;
+}
+
+.markLabel {
+  font-size: 2em;
+}
+
+.statusDiv {
+  width: 50%;
+  margin: auto;
+}
+
+table {
+  display: inline-table;
+}
+
+.times {
+  text-align: left;
+  margin-left: 30px;
+  font-style: italic;
+  color: #343e35;
+}
+
+.times span {
+  width: 70px;
+  font-style: normal;
+  font-weight: bold;}
+</style>
+<body>
+  <div class="container">
+    <h2>Tic Tac Toe</h2>
+    <hr></hr>
+    <div class="controls">
+      <span class="borderBottom">Player One</span>
+      <span class="borderBottom">Player Two</span>
+      <br/>
+      <span class="markLabel">X</span>
+      <span class="markLabel">O</span>
+      <br/>
+      <div class="times">Won <span id="pi" class="one_times">0</span> <span id="pii" class="two_times">0</span> times</div>
+      <div class="times">Lost <span id="ptwo" class="one_times">0</span> <span id="pone" class="two_times">0</span> times</div>
+      <br/>
+      <div class="statusDiv borderBottom">Game Status</div>
+      <p id = "gstatus" onclick = "play(event)">New Game</p>
+      <!-- Game Status Messages: Game in progress | Player 1 wins | Player 2 wins -->
+      <button onclick = "restart()">Restart</button>
+    </div>
+    <div class="board">
+      <table class="ticTable">
+        <tbody>
+          <tr>
+            <td id="0" onclick="play(event)" class="borderBottom borderRight"></td>
+            <td id="1" onclick="play(event)" class="borderBottom borderRight"></td>
+            <td id="2" onclick="play(event)" class="borderBottom"></td>
+          </tr>
+          <tr>
+            <td id="3" onclick="play(event)" class="borderBottom borderRight"></td>
+            <td id="4" onclick="play(event)" class="borderBottom borderRight"></td>
+            <td id="5" onclick="play(event)" class="borderBottom"></td>
+          </tr>
+          <tr>
+            <td id="6" onclick="play(event)" class="borderRight"></td>
+            <td id="7" onclick="play(event)" class="borderRight"></td>
+            <td id="8" onclick="play(event)"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script type="text/javascript" src="tictactoe.js"></script>
+  <script>
+      var clicked = [
+false, false, false,
+false, false, false,
+false, false, false
+];
+
+//to keep the marks of the players;
+var mark = [
+  0,0,0,0,0,0,0,0,0
+]
+//the winning-combinations
+var endGame = [
+	[0,1,2],
+	[3,4,5],
+	[6,7,8],
+  [0,3,6],
+  [1,4,7],
+  [2,5,8],
+	[0,4,8],
+	[2,4,6]
+];
+
+//to set turns
+var turn = true;
+
+//to know when the game's over
+var gameOver = false;
+
+//win counts
+var p1wins=0;
+var p2wins=0;
+
+/*function play(event) {
+  console.log(event);
+  event.target.innerHTML = turn? "O" : "X";
+  turn = !turn;
+}*/
+
+function play(event){
+	var element = event.target;
+
+	if ( clicked[element.id] === false && gameOver === false ) {
+
+    element.innerHTML = turn ? "X" : "O";
+    mark[element.id] = turn? 1 : 2;
+    clicked[element.id] = true;
+		turn = !turn;
+
+		console.log(clicked);
+    console.log(mark);
+		//console.log(event);
+
+		var result = checkEndGame();
+
+		if (result === 1) {
+      p1wins++;
+			console.log("Player 1 wins!");
+      document.getElementById('pi').innerHTML = p1wins;
+      document.getElementById('pone').innerHTML = p1wins;
+			document.getElementById('gstatus').innerHTML = "Player 1 wins!";
+			gameOver = true;
+      setTimeout(newGame, 2*1000);
+		}
+		if (result === 2) {
+      p2wins++;
+			console.log("Player 2 wins!");
+      document.getElementById('pii').innerHTML = p2wins;
+      document.getElementById('ptwo').innerHTML = p2wins;
+			document.getElementById('gstatus').innerHTML = "Player 2 wins!";
+			gameOver = true;
+      setTimeout(newGame, 2*1000);
+		}
+		if (result === 0) {
+			console.log("Tie");
+			document.getElementById('gstatus').innerHTML = "It's a Tie!";
+			gameOver = true;
+      setTimeout(newGame, 2*1000);
+		}
+		if (result === false) {
+			document.getElementById('gstatus').innerHTML = "Game in Progress";
+			console.log("Continue game");
+		}
+	}
+}
+
+function checkEndGame() {
+	for (var i = 0; i < endGame.length; i++) {
+		if (
+			clicked[endGame[i][0]] !== false &&
+			clicked[endGame[i][1]] !== false &&
+			clicked[endGame[i][2]] !== false
+		) {
+			if ( mark[endGame[i][0]] === mark[endGame[i][1]] && mark[endGame[i][1]] === mark[endGame[i][2]] ) {
+				if ( mark[endGame[i][0]] === 1) {
+					//player 1 wins
+					return 1;
+				}
+				if ( mark[endGame[i][0]] === 2) {
+					//player 2 wins
+					return 2;
+				}
+			}
+		}
+	}
+
+	//check tie
+  var tie = true;
+	for (var i = 0; i < clicked.length; i++) {
+		if (clicked[i] === false) {
+      tie = false;
+      break;
+		}
+	}
+
+	if (tie === true) {
+		return 0;
+	}
+//return to continue game
+	return false;
+}
+
+function restart (event){
+	for(var i = 0; i < clicked.length; i++){
+		if( clicked[i] !== false ) {
+			document.getElementById(i).innerHTML = '';
+			clicked[i] = false;
+      mark[i] = 0;
+		}
+	}
+	turn = true;
+	gameOver = false;
+  p1wins = 0;
+  p2wins = 0;
+  document.getElementById('pi').innerHTML = p1wins;
+  document.getElementById('pone').innerHTML = p1wins;
+  document.getElementById('pii').innerHTML = p2wins;
+  document.getElementById('ptwo').innerHTML = p2wins;
+	document.getElementById("gstatus").innerHTML = "New Game";
+}
+
+function newGame (event){
+	for(var i = 0; i < clicked.length; i++){
+		document.getElementById(i).innerHTML = '';
+		clicked[i] = false;
+    mark[i] = 0;
+	}
+	turn = true;
+	gameOver = false;
+	document.getElementById("gstatus").innerHTML = "New Game";
+}
+
+  </script>
+  
+<script>
+  $(function () {
+    var socket = io();
+    $('form').submit(function(){
+      socket.emit('play game', $('#m').val());
+      $('#m').val('');
+      return false;
+    });
+    socket.on('play game', function(game){
+      $('#messages').append($('<li>').text(game));
+    });
+  });
+</script>
+</body>
+</html>
